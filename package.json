@@ -1,0 +1,12 @@
+{
+  "name": "telecharger",
+  "version": "1.0.0",
+  "description": "Telecharger MP3, MP4 ou Image",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.0"
+  }
+}
