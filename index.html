@@ -1,169 +1,143 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MediaGrab</title>
+    <title>MediaGrab - Tutorial</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             background: #0f0f0f;
             font-family: 'Segoe UI', sans-serif;
             color: #fff;
+            padding: 40px 20px;
         }
         .container {
-            background: #1a1a2e;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-            width: 420px;
+            max-width: 700px;
+            margin: 0 auto;
         }
         h1 {
             text-align: center;
-            margin-bottom: 30px;
-            font-size: 24px;
+            font-size: 36px;
             color: #e94560;
+            margin-bottom: 10px;
         }
-        input[type="text"] {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid #333;
-            border-radius: 8px;
-            background: #16213e;
-            color: #fff;
-            font-size: 14px;
-            outline: none;
-            transition: border 0.3s;
-        }
-        input[type="text"]:focus { border-color: #e94560; }
-        .choices {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
-        }
-        .choice {
-            flex: 1;
-            padding: 16px;
-            border: 2px solid #333;
-            border-radius: 8px;
-            background: #16213e;
+        .subtitle {
             text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
+            color: #aaa;
+            margin-bottom: 40px;
+            font-size: 16px;
         }
-        .choice:hover { border-color: #e94560; transform: translateY(-2px); }
-        .choice.selected { border-color: #e94560; background: #1a1a3e; }
-        .choice .icon { font-size: 28px; display: block; margin-bottom: 8px; }
-        .choice .label { font-size: 13px; color: #aaa; }
-        button {
-            width: 100%;
-            margin-top: 20px;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
+        .step {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .step-number {
+            display: inline-block;
             background: #e94560;
             color: #fff;
-            font-size: 16px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
             font-weight: bold;
-            cursor: pointer;
+            margin-right: 12px;
+        }
+        .step-title {
+            display: inline;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .step-desc {
+            color: #aaa;
+            margin-top: 12px;
+            line-height: 1.6;
+        }
+        .step-desc a {
+            color: #e94560;
+            text-decoration: none;
+        }
+        .step-desc a:hover {
+            text-decoration: underline;
+        }
+        .highlight {
+            background: #e94560;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            color: #555;
+            margin-top: 40px;
+            font-size: 14px;
+        }
+        .footer a {
+            color: #e94560;
+            text-decoration: none;
+        }
+        .btn {
+            display: inline-block;
+            background: #e94560;
+            color: #fff;
+            padding: 14px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 20px;
             transition: background 0.3s;
         }
-        button:hover { background: #c73650; }
-        button:disabled { background: #444; cursor: not-allowed; }
-        .status {
-            margin-top: 16px;
-            text-align: center;
-            font-size: 14px;
-            color: #aaa;
-            min-height: 20px;
-        }
-        .status.error { color: #e94560; }
-        .status.success { color: #4ecca3; }
+        .btn:hover { background: #c73650; }
+        .center { text-align: center; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>MediaGrab</h1>
-        <input type="text" id="url" placeholder="Colle ton lien ici...">
-        <div class="choices">
-            <div class="choice" data-type="1" onclick="select(this)">
-                <span class="icon">&#9835;</span>
-                <span class="label">MP3</span>
-            </div>
-            <div class="choice" data-type="2" onclick="select(this)">
-                <span class="icon">&#9654;</span>
-                <span class="label">MP4</span>
-            </div>
-            <div class="choice" data-type="3" onclick="select(this)">
-                <span class="icon">&#128247;</span>
-                <span class="label">Image</span>
-            </div>
+        <p class="subtitle">Download YouTube videos as MP3, MP4, or images</p>
+
+        <div class="step">
+            <span class="step-number">1</span>
+            <span class="step-title">Go to the GitHub repo</span>
+            <p class="step-desc">
+                Click here: <a href="https://github.com/fr4ncais/mediagrab" target="_blank">github.com/fr4ncais/mediagrab</a>
+            </p>
         </div>
-        <button id="btn" onclick="download()" disabled>Telecharger</button>
-        <div class="status" id="status"></div>
+
+        <div class="step">
+            <span class="step-number">2</span>
+            <span class="step-title">Download lancer.bat</span>
+            <p class="step-desc">
+                Click on <span class="highlight">lancer.bat</span> then click the <span class="highlight">3 dots</span> menu (top right) and select <span class="highlight">Download</span>
+            </p>
+        </div>
+
+        <div class="step">
+            <span class="step-number">3</span>
+            <span class="step-title">Run the file</span>
+            <p class="step-desc">
+                Open <span class="highlight">lancer.bat</span> and click <span class="highlight">OK</span> when the security warning appears
+            </p>
+        </div>
+
+        <div class="step">
+            <span class="step-number">4</span>
+            <span class="step-title">Open the site</span>
+            <p class="step-desc">
+                A terminal window will open. Then go to <a href="http://localhost:3000" target="_blank">http://localhost:3000</a> in your browser. Paste a YouTube link, choose MP3/MP4/Image and click Download!
+            </p>
+        </div>
+
+        <div class="center">
+            <a href="https://github.com/fr4ncais/mediagrab" target="_blank" class="btn">Go to GitHub</a>
+        </div>
+
+        <p class="footer">Made by <a href="https://github.com/fr4ncais">fr4ncais</a></p>
     </div>
-
-    <script>
-        let selected = null;
-
-        function select(el) {
-            document.querySelectorAll('.choice').forEach(c => c.classList.remove('selected'));
-            el.classList.add('selected');
-            selected = el.dataset.type;
-            document.getElementById('btn').disabled = false;
-        }
-
-        async function download() {
-            const url = document.getElementById('url').value.trim();
-            const btn = document.getElementById('btn');
-            const status = document.getElementById('status');
-
-            if (!url) { status.textContent = "Mets un lien !"; status.className = "status error"; return; }
-            if (!selected) { status.textContent = "Choisis un format !"; status.className = "status error"; return; }
-
-            btn.disabled = true;
-            status.textContent = "Telechargement en cours...";
-            status.className = "status";
-
-            try {
-                const res = await fetch('/download', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url, type: selected })
-                });
-
-                if (!res.ok) {
-                    const err = await res.json();
-                    throw new Error(err.error || "Erreur");
-                }
-
-                const blob = await res.blob();
-                const disposition = res.headers.get('Content-Disposition');
-                let filename = "fichier";
-                if (disposition) {
-                    const match = disposition.match(/filename="?([^"]+)"?/);
-                    if (match) filename = match[1];
-                }
-
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = filename;
-                a.click();
-                URL.revokeObjectURL(a.href);
-
-                status.textContent = "Termine ! " + filename;
-                status.className = "status success";
-            } catch (e) {
-                status.textContent = "Erreur : " + e.message;
-                status.className = "status error";
-            }
-
-            btn.disabled = false;
-        }
-    </script>
 </body>
 </html>
