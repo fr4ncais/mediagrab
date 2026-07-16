@@ -1,10 +1,169 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <meta http-equiv="refresh" content="0; url=https://telecharger.onrender.com">
-    <title>Redirecting...</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telecharger</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0f0f0f;
+            font-family: 'Segoe UI', sans-serif;
+            color: #fff;
+        }
+        .container {
+            background: #1a1a2e;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            width: 420px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+            color: #e94560;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background: #16213e;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: border 0.3s;
+        }
+        input[type="text"]:focus { border-color: #e94560; }
+        .choices {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .choice {
+            flex: 1;
+            padding: 16px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background: #16213e;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .choice:hover { border-color: #e94560; transform: translateY(-2px); }
+        .choice.selected { border-color: #e94560; background: #1a1a3e; }
+        .choice .icon { font-size: 28px; display: block; margin-bottom: 8px; }
+        .choice .label { font-size: 13px; color: #aaa; }
+        button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: #e94560;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover { background: #c73650; }
+        button:disabled { background: #444; cursor: not-allowed; }
+        .status {
+            margin-top: 16px;
+            text-align: center;
+            font-size: 14px;
+            color: #aaa;
+            min-height: 20px;
+        }
+        .status.error { color: #e94560; }
+        .status.success { color: #4ecca3; }
+    </style>
 </head>
 <body>
-    <p>Redirection vers <a href="https://telecharger.onrender.com">telecharger.onrender.com</a>...</p>
+    <div class="container">
+        <h1>Telecharger</h1>
+        <input type="text" id="url" placeholder="Colle ton lien ici...">
+        <div class="choices">
+            <div class="choice" data-type="1" onclick="select(this)">
+                <span class="icon">&#9835;</span>
+                <span class="label">MP3</span>
+            </div>
+            <div class="choice" data-type="2" onclick="select(this)">
+                <span class="icon">&#9654;</span>
+                <span class="label">MP4</span>
+            </div>
+            <div class="choice" data-type="3" onclick="select(this)">
+                <span class="icon">&#128247;</span>
+                <span class="label">Image</span>
+            </div>
+        </div>
+        <button id="btn" onclick="download()" disabled>Telecharger</button>
+        <div class="status" id="status"></div>
+    </div>
+
+    <script>
+        let selected = null;
+
+        function select(el) {
+            document.querySelectorAll('.choice').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            selected = el.dataset.type;
+            document.getElementById('btn').disabled = false;
+        }
+
+        async function download() {
+            const url = document.getElementById('url').value.trim();
+            const btn = document.getElementById('btn');
+            const status = document.getElementById('status');
+
+            if (!url) { status.textContent = "Mets un lien !"; status.className = "status error"; return; }
+            if (!selected) { status.textContent = "Choisis un format !"; status.className = "status error"; return; }
+
+            btn.disabled = true;
+            status.textContent = "Telechargement en cours...";
+            status.className = "status";
+
+            try {
+                const res = await fetch('/download', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url, type: selected })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.error || "Erreur");
+                }
+
+                const blob = await res.blob();
+                const disposition = res.headers.get('Content-Disposition');
+                let filename = "fichier";
+                if (disposition) {
+                    const match = disposition.match(/filename="?([^"]+)"?/);
+                    if (match) filename = match[1];
+                }
+
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(a.href);
+
+                status.textContent = "Termine ! " + filename;
+                status.className = "status success";
+            } catch (e) {
+                status.textContent = "Erreur : " + e.message;
+                status.className = "status error";
+            }
+
+            btn.disabled = false;
+        }
+    </script>
 </body>
 </html>
