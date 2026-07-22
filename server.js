@@ -75,9 +75,9 @@ app.post('/download', (req, res) => {
 
     let args = [];
     if (type === '1') {
-        args = ['-x', '--audio-format', 'mp3', '--cookies-from-browser', 'firefox', '--remote-components', 'ejs:github', '--newline', '-o', outputTemplate, url];
+        args = ['-x', '--audio-format', 'mp3', '--remote-components', 'ejs:github', '--newline', '-o', outputTemplate, url];
     } else if (type === '2') {
-        args = ['-f', 'bestvideo[height<=1080][fps=60][ext=mp4]+bestaudio[ext=m4a]/bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', '--cookies-from-browser', 'firefox', '--remote-components', 'ejs:github', '--newline', '-o', outputTemplate, url];
+        args = ['-f', 'bestvideo[height<=1080][fps=60][ext=mp4]+bestaudio[ext=m4a]/bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', '--remote-components', 'ejs:github', '--newline', '-o', outputTemplate, url];
     } else {
         return res.status(400).json({ error: 'Invalid format' });
     }
