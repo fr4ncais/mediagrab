@@ -5,7 +5,7 @@ const fs = require('fs');
 const os = require('os');
 
 const app = express();
-const PORT = 3001;
+const PORT = 3000;
 
 const ytdlp = path.join(os.homedir(), 'AppData', 'Local', 'Python', 'pythoncore-3.14-64', 'Scripts', 'yt-dlp.exe');
 const denoPath = path.join(os.homedir(), '.deno', 'bin');
