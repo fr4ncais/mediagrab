@@ -31,5 +31,5 @@ if not exist "%FOLDER%\%FILE%" (
 :: Launch
 cd /d "%FOLDER%"
 echo Starting MediaGrab...
-start "" http://localhost:3000
+start "" http://localhost:3001
 node server.js

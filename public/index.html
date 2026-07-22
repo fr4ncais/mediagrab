@@ -21,17 +21,73 @@
         </div>
 
         <div id="status"></div>
-        <div id="progress-bar" class="hidden">
-            <div id="progress"></div>
+
+        <div id="progress-container" class="hidden">
+            <div id="progress-bar">
+                <div id="progress-fill"></div>
+            </div>
+            <div id="progress-info">
+                <span id="progress-pct">0%</span>
+                <span id="progress-speed"></span>
+                <span id="progress-eta"></span>
+            </div>
         </div>
     </div>
 
     <script>
         const urlInput = document.getElementById('url');
         const status = document.getElementById('status');
-        const progressBar = document.getElementById('progress-bar');
-        const progress = document.getElementById('progress');
+        const progressContainer = document.getElementById('progress-container');
+        const progressFill = document.getElementById('progress-fill');
+        const progressPct = document.getElementById('progress-pct');
+        const progressSpeed = document.getElementById('progress-speed');
+        const progressEta = document.getElementById('progress-eta');
 
+        // Connect to SSE for real-time progress
+        let eventSource = null;
+
+        function connectSSE() {
+            if (eventSource) eventSource.close();
+            eventSource = new EventSource('/progress');
+            eventSource.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+                updateProgress(data);
+            };
+        }
+
+        function updateProgress(data) {
+            if (data.status === 'downloading') {
+                progressContainer.classList.remove('hidden');
+                progressFill.style.width = data.percent + '%';
+                progressPct.textContent = data.percent.toFixed(1) + '%';
+                if (data.speed) progressSpeed.textContent = data.speed;
+                if (data.eta) progressEta.textContent = 'ETA ' + data.eta;
+                status.textContent = 'Downloading...';
+                status.className = 'loading';
+            } else if (data.status === 'converting') {
+                progressFill.style.width = '95%';
+                progressPct.textContent = '95%';
+                status.textContent = 'Converting audio...';
+                status.className = 'loading';
+            } else if (data.status === 'done') {
+                progressFill.style.width = '100%';
+                progressPct.textContent = '100%';
+                status.textContent = 'Download complete!';
+                status.className = 'success';
+                setTimeout(() => {
+                    progressContainer.classList.add('hidden');
+                }, 2000);
+            } else if (data.status === 'error') {
+                status.textContent = 'Error: ' + (data.text || 'Download failed');
+                status.className = 'error';
+                progressContainer.classList.add('hidden');
+            }
+        }
+
+        // Start SSE connection on load
+        connectSSE();
+
+        // Download button logic
         document.querySelectorAll('.btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const url = urlInput.value.trim();
@@ -41,16 +97,17 @@
                     return;
                 }
 
-                status.textContent = 'Downloading...';
+                // Reset progress
+                progressFill.style.width = '0%';
+                progressPct.textContent = '0%';
+                progressSpeed.textContent = '';
+                progressEta.textContent = '';
+                status.textContent = 'Starting download...';
                 status.className = 'loading';
-                progressBar.classList.remove('hidden');
-                progress.style.width = '0%';
+                progressContainer.classList.remove('hidden');
 
-                let p = 0;
-                const interval = setInterval(() => {
-                    p = Math.min(p + Math.random() * 15, 90);
-                    progress.style.width = p + '%';
-                }, 500);
+                // Reconnect SSE in case it dropped
+                connectSSE();
 
                 fetch('/download', {
                     method: 'POST',
@@ -58,30 +115,19 @@
                     body: JSON.stringify({ url, type: btn.dataset.type })
                 })
                 .then(res => {
-                    clearInterval(interval);
-                    progress.style.width = '100%';
-
                     if (!res.ok) throw new Error('Download failed');
                     return res.blob();
                 })
                 .then(blob => {
-                    const disposition = blob.headers?.get('content-disposition');
-                    const filename = disposition
-                        ? disposition.split('filename=')[1]?.replace(/"/g, '')
-                        : 'download';
-
                     const a = document.createElement('a');
                     a.href = URL.createObjectURL(blob);
-                    a.download = filename;
+                    a.download = 'download';
                     a.click();
-
-                    status.textContent = 'Download complete!';
-                    status.className = 'success';
                 })
                 .catch(err => {
-                    clearInterval(interval);
                     status.textContent = 'Error: ' + err.message;
                     status.className = 'error';
+                    progressContainer.classList.add('hidden');
                 });
             });
         });
