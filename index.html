@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediaGrab - YouTube Downloader</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 400px;
+            max-width: 90%;
+        }
+        h1 { color: #333; margin-bottom: 10px; }
+        .container p { color: #666; margin-bottom: 30px; }
+        input[type="text"] {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus { border-color: #667eea; }
+        .buttons { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            color: white;
+            font-weight: bold;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2); }
+        .btn.mp3 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .btn.mp4 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .btn.img { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        #status { margin-top: 15px; font-size: 14px; min-height: 20px; }
+        #status.error { color: #e74c3c; }
+        #status.success { color: #27ae60; }
+        #status.loading { color: #3498db; }
+        #progress-bar {
+            margin-top: 15px;
+            height: 6px;
+            background: #eee;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        #progress {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0;
+            transition: width 0.3s;
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-download"></i> MediaGrab</h1>
+        <p>Download YouTube videos as MP3, MP4 or Image</p>
+        <input type="text" id="url" placeholder="Paste YouTube link here...">
+        <div class="buttons">
+            <button class="btn mp3" onclick="download(1)"><i class="fas fa-music"></i> MP3</button>
+            <button class="btn mp4" onclick="download(2)"><i class="fas fa-video"></i> MP4</button>
+            <button class="btn img" onclick="download(3)"><i class="fas fa-image"></i> Image</button>
+        </div>
+        <div id="status"></div>
+        <div id="progress-bar" class="hidden"><div id="progress"></div></div>
+    </div>
+    <script>
+        function download(type) {
+            const url = document.getElementById('url').value;
+            const status = document.getElementById('status');
+            const progressBar = document.getElementById('progress-bar');
+            const progress = document.getElementById('progress');
+            
+            status.textContent = 'Downloading...';
+            status.className = 'loading';
+            progressBar.classList.remove('hidden');
+            progress.style.width = '0%';
+            
+            let p = 0;
+            const interval = setInterval(() => {
+                p = Math.min(p + Math.random() * 15, 90);
+                progress.style.width = p + '%';
+            }, 500);
+            
+            fetch('https://telecharger.onrender.com/download', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: url, type: type })
+            })
+            .then(res => {
+                clearInterval(interval);
+                progress.style.width = '100%';
+                if (!res.ok) throw new Error('Download failed');
+                return res.blob();
+            })
+            .then(blob => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'download';
+                a.click();
+                status.textContent = 'Download complete!';
+                status.className = 'success';
+            })
+            .catch(err => {
+                clearInterval(interval);
+                status.textContent = 'Error: ' + err.message;
+                status.className = 'error';
+            });
+        }
+    </script>
+</body>
+</html>
