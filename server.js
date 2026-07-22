@@ -1,11 +1,25 @@
 const express = require('express');
-const { spawn } = require('child_process');
+const { spawn, execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
+const net = require('net');
 
 const app = express();
 const PORT = 3000;
+
+// Kill existing process on port 3000
+try {
+    const result = execSync('netstat -ano | findstr ":3000.*LISTENING"', { encoding: 'utf8' });
+    const lines = result.trim().split('\n');
+    for (const line of lines) {
+        const parts = line.trim().split(/\s+/);
+        const pid = parts[parts.length - 1];
+        if (pid && pid !== '0') {
+            try { execSync(`taskkill /F /PID ${pid}`); } catch(e) {}
+        }
+    }
+} catch(e) {}
 
 const ytdlp = path.join(os.homedir(), 'AppData', 'Local', 'Python', 'pythoncore-3.14-64', 'Scripts', 'yt-dlp.exe');
 const denoPath = path.join(os.homedir(), '.deno', 'bin');
