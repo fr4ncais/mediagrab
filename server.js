@@ -84,9 +84,8 @@ app.post('/download', (req, res) => {
 
     broadcastProgress({ status: 'starting', percent: 0, text: 'Starting download...' });
 
-    const proc = spawn(`"${ytdlp}"`, args, {
-        env: { ...process.env, PATH: envPath },
-        shell: true
+    const proc = spawn(ytdlp, args, {
+        env: { ...process.env, PATH: envPath }
     });
 
     proc.stdout.on('data', (data) => {
